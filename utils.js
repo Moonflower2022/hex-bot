@@ -12,3 +12,7 @@ function colorsEqual(color1, color2) {
     }
     return true
 }
+
+function oppositeColor(color) {
+    return color == 0 ? 1 : 0;
+}

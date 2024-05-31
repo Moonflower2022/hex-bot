@@ -1,3 +1,13 @@
+function getSelected(event) {
+    var color = ctx.getImageData(event.clientX - 20, event.clientY, 1, 1).data;
+    color[0] -= color[2] == 38 || color[2] == 178 ? 241 : 0;
+    color[1] -= color[2] == 178 ? 220 : (color[2] == 38 ? 0 : 140);
+    if (color[0] >= 0 && color[0] <= 13 && color[1] >= 0 && color[1] <= 13 && (color[2] == 38 || color[2] == 171 || color[2] == 178))
+        selected = [color[0], color[1]];
+    else
+        selected = [-1, -1];
+}
+
 function drawHexagon(color, x, y, radius) {
     color.beginPath();
     color.moveTo(x, y - radius);
@@ -18,7 +28,7 @@ function drawPath(ctx, p) {
 }
 
 function handleWinCheck(showAlerts=true) {
-    var p0 = checkWin(0), p1 = checkWin(1);
+    var p0 = checkWin(board, 0), p1 = checkWin(board, 1);
     if (p0 != false) { 
         drawPath(ctx, p0); 
         if (showAlerts) 
@@ -31,7 +41,7 @@ function handleWinCheck(showAlerts=true) {
     }
 }
 
-function draw() {
+function draw(board, player, selected, ctx) {
     ctx.clearRect(0, 0, 850, 600);
     ctx.lineWidth = 1;
 

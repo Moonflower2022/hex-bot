@@ -13,17 +13,22 @@
 </head>
 
 <body onload="load()">
-    <canvas class="canvas" width="850" height="600" id="output">Canvas not
+    <canvas class="canvas" width="1000" height="700" id="output">Canvas not
         supported...</canvas>
     <div class="ui-container column">
-        <button onclick="init()">New game</button>
+        <button id="new-game">New game</button>
         <button onclick="undo()">Undo</button>
         <button onclick="exportGameData()">Export Game Data</button>
         <button onclick="importGameData()">Load Game Data</button>
         <div>
             Multiplayer:
-            <input type="checkbox" onClick="changeMode()" id="change-mode">
+            <input type="checkbox" onclick="changeMode()" id="change-mode">
         </div>
+        <div>
+            Board Length:
+            <input oninput="changeBoardLength(this.value)">
+        </div>
+        
         
 
     </div>

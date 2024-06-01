@@ -1,9 +1,10 @@
 
 function getConnections(x, y, board, color, open, closed) {
+    const boardLength = board.length;
     var a = [-1, 0, 1, 0, 0, -1, 0, 1, 1, -1, -1, 1];
     var ret = [];
     for (var i = 0; i < 6; i++)
-        if (x + a[i * 2] >= 0 && x + a[i * 2] < 14 && y + a[i * 2 + 1] >= 0 && y + a[i * 2 + 1] < 14)
+        if (x + a[i * 2] >= 0 && x + a[i * 2] < boardLength && y + a[i * 2 + 1] >= 0 && y + a[i * 2 + 1] < boardLength)
             if (board[x + a[i * 2]][y + a[i * 2 + 1]] == color && findArr(open, [x + a[i * 2], y + a[i * 2 + 1]]) == -1 && findArr(closed, [x + a[i * 2], y + a[i * 2 + 1]]) == -1)
                 ret.push([x + a[i * 2], y + a[i * 2 + 1]]);
 
@@ -11,8 +12,9 @@ function getConnections(x, y, board, color, open, closed) {
 }
 
 function checkWin(board, color) {
+    const boardLength = board.length;
     var open = [], openPrev = [], closed = [], closedPrev = [];
-    for (var a = 0; a < 14; a++) {
+    for (var a = 0; a < boardLength; a++) {
         if (board[color == 0 ? a : 0][color == 0 ? 0 : a] == color) {
             open.length = openPrev.length = closed.length = closedPrev.length = 0;
             var pathFound = false;
@@ -24,7 +26,7 @@ function checkWin(board, color) {
                 var uI = openPrev.splice(0, 1);
                 closed.push(u);
                 closedPrev.push(uI);
-                if (u[oppositeColor(color)] == 13) {
+                if (u[oppositeColor(color)] == boardLength - 1) {
                     pathFound = true;
                     break;
                 }

@@ -5,44 +5,54 @@ const BLUE = "rgb(0,94,132)"
 var ctx;
 var selected = [-1, -1];
 var board;
-var past_moves = [];
+var pastMoves = [];
 var playerColor = 0;
 var multiplayer = false;
 var active = true;
+var boardLength = 14;
 
 function changeMode() {
     multiplayer = !multiplayer;
     playerColor = 0;
-    init();
-    saveGameState();
+    init(boardLength);
+    
+}
+
+function changeBoardLength(newLength) {
+    if (Number.isNaN(parseInt(newLength)) || parseInt(newLength) < 1 || parseInt(newLength) > 16)
+        return
+    boardLength = parseInt(newLength);
+    playerColor = 0;
+    init(boardLength);
 }
 
 function undo() {
     if (active) {
         var a;
-        if (past_moves.length > 0) {
-            a = past_moves[past_moves.length - 1];
+        if (pastMoves.length > 0) {
+            a = pastMoves[pastMoves.length - 1];
             board[a[0]][a[1]] = -1;
-            past_moves.pop();
+            pastMoves.pop();
         }
         if (!multiplayer) {
-            a = past_moves[past_moves.length - 1];
+            a = pastMoves[pastMoves.length - 1];
             board[a[0]][a[1]] = -1;
-            past_moves.pop();
+            pastMoves.pop();
         }
         playerColor = a[2];
         saveGameState();
-        draw(board, playerColor, selected, ctx);
+        draw(board, playerColor, selected, width, radius, ctx);
     }
 }
 
 function getGameState() {
     return JSON.stringify({
         board: board,
-        past_moves: past_moves,
+        pastMoves: pastMoves,
         playerColor: playerColor,
         multiplayer: multiplayer,
-        active: active
+        active: active,
+        boardLength: boardLength
     })
 }
 
@@ -54,10 +64,11 @@ function loadGameState() {
     const savedState = JSON.parse(localStorage.getItem('hexGameState'));
     if (savedState) {
         board = savedState.board;
-        past_moves = savedState.past_moves;
+        pastMoves = savedState.pastMoves;
         playerColor = savedState.playerColor;
         multiplayer = savedState.multiplayer;
         active = savedState.active;
+        boardLength = savedState.boardLength;
     }
 }
 
@@ -67,11 +78,9 @@ function exportGameData() {
 
 function importGameData() {
     let data = prompt("Paste game data here:")
-    console.log(data)
     saveGameState(data);
-    console.log(getGameState())
     loadGameState();
-    draw(board, playerColor, selected, ctx);
+    draw(board, playerColor, selected, width, radius, ctx);
     handleWinCheck();
 }
 
@@ -79,13 +88,13 @@ function mouseDown(event) {
     getSelected(event);
     if (active) {
         if (selected[0] != -1 && selected[1] != -1) {
-            past_moves.push([selected[0], selected[1], playerColor]);
+            pastMoves.push([selected[0], selected[1], playerColor]);
             board[selected[0]][selected[1]] = playerColor;
             if (multiplayer)
                 playerColor = oppositeColor(playerColor);
             else
-                botMove(monteCarloTreeSearch, board, past_moves, playerColor);
-            draw(board, playerColor, selected, ctx);
+                botMove(monteCarloTreeSearch, board, pastMoves, playerColor);
+            draw(board, playerColor, selected, width, radius, ctx);
             handleWinCheck();
         }
     }
@@ -95,32 +104,36 @@ function mouseDown(event) {
 function mouseMove(event) {
     getSelected(event);
     if (active)
-        draw(board, playerColor, selected, ctx);
+        draw(board, playerColor, selected, width, radius, ctx);
 }
 
-function init() {
-    board = new Array(14);
-    for (var i = 0; i < 14; i++) {
-        board[i] = new Array(14);
-        for (var j = 0; j < 14; j++)
+function init(boardLength) {
+    board = new Array(boardLength);
+    for (var i = 0; i < boardLength; i++) {
+        board[i] = new Array(boardLength);
+        for (var j = 0; j < boardLength; j++)
             board[i][j] = -1;
     }
-    past_moves = [];
+    pastMoves = [];
     active = true;
-    draw(board, playerColor, selected, ctx);
+    saveGameState();
+    draw(board, playerColor, selected, width, radius, ctx);
 }
 
 function load() {
     var canvas = document.getElementById("output");
     ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const newGameButton = document.getElementById("new-game");
+    newGameButton.onclick = () => {init(boardLength)};
     var monteCarloTreeSearch = new MonteCarloTreeSearch()
     canvas.onmousedown = mouseDown;
     canvas.onmousemove = mouseMove;
-    init();
-    if (localStorage.getItem("hexGameState") === null)
+    if (localStorage.getItem("hexGameState") === null) {
         saveGameState();
+    }
+        
     loadGameState();
     document.getElementById("change-mode").checked = multiplayer;
-    draw(board, playerColor, selected, ctx);
+    draw(board, playerColor, selected, width, radius, ctx);
     handleWinCheck(showAlerts = false);
 }

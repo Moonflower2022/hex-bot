@@ -56,9 +56,10 @@ function botMove(monteCarloTreeSearch, board, hist, playerColor) {
 }
 
 function randomMove(board) {
+    const boardLength = board.length
     var move;
     do
-        move = [Math.floor(Math.random() * 14), Math.floor(Math.random() * 14)];
+        move = [Math.floor(Math.random() * boardLength), Math.floor(Math.random() * boardLength)];
     while (board[move[0]][move[1]] != -1);
     return move;
 }

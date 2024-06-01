@@ -1,5 +1,5 @@
 function getSelected(event) {
-    var color = ctx.getImageData(event.clientX - 20, event.clientY, 1, 1).data;
+    var color = ctx.getImageData(event.clientX - 50, event.clientY - 50, 1, 1).data;
     color[0] -= color[2] == 38 || color[2] == 178 ? 241 : 0;
     color[1] -= color[2] == 178 ? 220 : (color[2] == 38 ? 0 : 140);
     if (color[0] >= 0 && color[0] <= 13 && color[1] >= 0 && color[1] <= 13 && (color[2] == 38 || color[2] == 171 || color[2] == 178))
@@ -8,14 +8,14 @@ function getSelected(event) {
         selected = [-1, -1];
 }
 
-function drawHexagon(color, x, y, radius) {
-    color.beginPath();
-    color.moveTo(x, y - radius);
+function drawHexagon(ctx, x, y, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - radius);
     for (var i = 0; i < 6; i++)
-        color.lineTo(x + radius * Math.cos(Math.PI * (1.5 + 1 / 3 * i)), y + radius * Math.sin(Math.PI * (1.5 + 1 / 3 * i)));
-    color.closePath();
-    color.fill();
-    color.stroke();
+        ctx.lineTo(x + radius * Math.cos(Math.PI * (1.5 + 1 / 3 * i)), y + radius * Math.sin(Math.PI * (1.5 + 1 / 3 * i)));
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
 }
 
 function drawPath(ctx, p) {
@@ -41,40 +41,52 @@ function handleWinCheck(showAlerts=true) {
     }
 }
 
-function draw(board, player, selected, ctx) {
+function getDrawCoordinates(i, j, width, radius) {
+    return [(i + j) * width - (j - 4) * (width / 2), (j + 2) * 1.5 * radius]
+}
+
+function draw(board, player, selected, width, radius, ctx) {
+    const boardLength = board.length;
     ctx.clearRect(0, 0, 850, 600);
     ctx.lineWidth = 1;
 
+    const [left, top] = getDrawCoordinates(0, 0, width, radius);
+    const topRight = getDrawCoordinates(boardLength - 1, 0, width, radius)[0]
+    console.log(topRight)
+    const bottomLeft = getDrawCoordinates(0, boardLength - 1, width, radius)[0]
+    console.log(bottomLeft)
+    const [right, bottom] = getDrawCoordinates(boardLength - 1, boardLength - 1, width, radius);
+
     ctx.fillStyle = BLUE;
     ctx.beginPath();
-    ctx.moveTo(width * 15.65, radius);
-    ctx.lineTo(width * 23.5, 24.5 * radius);
-    ctx.lineTo(0, radius);
-    ctx.lineTo(width * 7.85, 24.5 * radius);
+    ctx.moveTo(topRight + radius * 1.2, top - 2 * radius);
+    ctx.lineTo(right + 2 * width, bottom + 2 * radius);
+    ctx.lineTo(left - 2 * width, top - 2 * radius);
+    ctx.lineTo(bottomLeft - radius * 1.2, bottom + 2 * radius);
     ctx.closePath();
     ctx.fill();
 
     ctx.fillStyle = RED;
     ctx.beginPath();
-    ctx.moveTo(0, radius);
-    ctx.lineTo(width * 15.65, radius);
-    ctx.lineTo(width * 7.85, 24.5 * radius);
-    ctx.lineTo(width * 23.5, 24.5 * radius);
+    ctx.moveTo(left - 2 * width, top - 2 * radius);
+    ctx.lineTo(topRight + radius * 1.2, top - 2 * radius);
+    ctx.lineTo(bottomLeft - radius * 1.2, bottom + 2 * radius);
+    ctx.lineTo(right + 2 * width, bottom + 2 * radius);
     ctx.closePath();
     ctx.fill();
 
     ctx.strokeStyle = "white";
-    for (var y = 0; y < 14; y++) {
-        for (var x = 0; x < 14; x++) {
-            if (board[x][y] == 0)
+    for (var j = 0; j < boardLength; j++) {
+        for (var i = 0; i < boardLength; i++) {
+            if (board[i][j] == 0)
                 ctx.fillStyle = RED;
-            else if (board[x][y] == 1)
+            else if (board[i][j] == 1)
                 ctx.fillStyle = BLUE;
-            else if (x == selected[0] && y == selected[1])
-                ctx.fillStyle = "rgb(" + (x + (player == 0 ? 241 : 0)) + "," + (y + (player == 0 ? 0 : 140)) + "," + (player == 0 ? 38 : 171) + ")"; //player === 0 ? LIGHT_BLUE : LIGHT_RED;
+            else if (i == selected[0] && j == selected[1])
+                ctx.fillStyle = "rgb(" + (i + (player == 0 ? 241 : 0)) + "," + (j + (player == 0 ? 0 : 140)) + "," + (player == 0 ? 38 : 171) + ")"; //player === 0 ? LIGHT_BLUE : LIGHT_RED;
             else
-                ctx.fillStyle = "rgb(" + (x + 241) + "," + (y + 220) + ",178)";
-            drawHexagon(ctx, (x + y) * width - (y - 4) * (width / 2), (y + 2) * 1.5 * radius, radius);
+                ctx.fillStyle = "rgb(" + (i + 241) + "," + (j + 220) + ",178)";
+            drawHexagon(ctx, ...getDrawCoordinates(i, j, width, radius), radius);
         }
     }
 }

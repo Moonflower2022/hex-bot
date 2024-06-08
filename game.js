@@ -45,7 +45,6 @@ function checkWin(board, color) {
                 }
                 path.push([color == 0 ? a : 0, color == 0 ? 0 : a]);
                 path.reverse();
-                active = false;
                 return path;
             }
         }

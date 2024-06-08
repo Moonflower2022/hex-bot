@@ -2,7 +2,7 @@ function getSelected(event) {
     var color = ctx.getImageData(event.clientX - 50, event.clientY - 50, 1, 1).data;
     color[0] -= color[2] == 38 || color[2] == 178 ? 241 : 0;
     color[1] -= color[2] == 178 ? 220 : (color[2] == 38 ? 0 : 140);
-    if (color[0] >= 0 && color[0] <= 13 && color[1] >= 0 && color[1] <= 13 && (color[2] == 38 || color[2] == 171 || color[2] == 178))
+    if (color[0] >= 0 && color[0] <= boardLength - 1 && color[1] >= 0 && color[1] <= boardLength - 1 && (color[2] == 38 || color[2] == 171 || color[2] == 178))
         selected = [color[0], color[1]];
     else
         selected = [-1, -1];
@@ -39,6 +39,7 @@ function handleWinCheck(showAlerts=true) {
         if (showAlerts)
             alert((multiplayer ? "The blue player" : "The computer") + " won!"); 
     }
+    active = !p0 && !p0;
 }
 
 function getDrawCoordinates(i, j, width, radius) {
@@ -47,14 +48,12 @@ function getDrawCoordinates(i, j, width, radius) {
 
 function draw(board, player, selected, width, radius, ctx) {
     const boardLength = board.length;
-    ctx.clearRect(0, 0, 850, 600);
+    ctx.clearRect(0, 0, 1000, 700);
     ctx.lineWidth = 1;
 
     const [left, top] = getDrawCoordinates(0, 0, width, radius);
     const topRight = getDrawCoordinates(boardLength - 1, 0, width, radius)[0]
-    console.log(topRight)
     const bottomLeft = getDrawCoordinates(0, boardLength - 1, width, radius)[0]
-    console.log(bottomLeft)
     const [right, bottom] = getDrawCoordinates(boardLength - 1, boardLength - 1, width, radius);
 
     ctx.fillStyle = BLUE;

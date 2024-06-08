@@ -22,6 +22,18 @@ function statesEqual(state1, state2) {
     return true;
 }
 
+function remainingSquares(state) {
+    let total = 0;
+    for (let i = 0; i < state.length; i++) {
+        for (let j = 0; j < state[i].length; j++) {
+            if (state[i][j] === -1) {
+                total++;
+            }
+        }
+    }
+    return total;
+}
+
 function copyState(state) {
     return JSON.parse(JSON.stringify(state));
 }
@@ -33,7 +45,7 @@ function oppositeColor(color) {
 function getMove(previousState, state) {
     for (let i = 0; i < state.length; i++) {
         for (let j = 0; j < state[i].length; j++) {
-            if (previousState[i][j] !== state[j][i]) {
+            if (previousState[i][j] !== state[i][j]) {
                 return [i, j];
             }
         }

@@ -9,7 +9,7 @@ class Node {
         this.wins = 0;
         this.remainingSquares =
             parent === null
-                ? state.length * state.length
+                ? remainingSquares(state)
                 : this.parent.remainingsquares - 1;
         this.terminated = terminated; // false means no, number means the side that won (since no ties)
     }
@@ -21,7 +21,7 @@ class Node {
     chooseLeaf = () => {
         let currentNode = this;
 
-        while (!currentNode.isLeaf && !currentNode.isFullyExpanded()) {
+        while (!currentNode.isLeaf && currentNode.isFullyExpanded()) {
             currentNode = currentNode.bestUTC();
         }
 
@@ -60,7 +60,7 @@ class Node {
     };
 
     expand = (expansionCount) => {
-        if (this.terminated) {
+        if (this.terminated !== false) {
             console.log("warning: expanding terminated node, returning this");
             return this;
         } else {
@@ -126,6 +126,7 @@ function monteCarloTreeSearch(
             bestState = child.state;
         }
     }
+    console.log(root)
     return getMove(state, bestState);
 }
 
@@ -138,16 +139,11 @@ function botMove(board, hist, playerColor) {
 function randomMove(board) {
     const boardLength = board.length;
     var move;
-    let i = 0;
     do {
-        i++
         move = [
             Math.floor(Math.random() * boardLength),
             Math.floor(Math.random() * boardLength),
         ];
-        if (i > 100000){
-            let rsotien = 0;
-        }
     }
     while (board[move[0]][move[1]] != -1);
     return move;

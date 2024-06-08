@@ -1,11 +1,19 @@
-
 function getConnections(x, y, board, color, open, closed) {
     const boardLength = board.length;
     var a = [-1, 0, 1, 0, 0, -1, 0, 1, 1, -1, -1, 1];
     var ret = [];
     for (var i = 0; i < 6; i++)
-        if (x + a[i * 2] >= 0 && x + a[i * 2] < boardLength && y + a[i * 2 + 1] >= 0 && y + a[i * 2 + 1] < boardLength)
-            if (board[x + a[i * 2]][y + a[i * 2 + 1]] == color && findArr(open, [x + a[i * 2], y + a[i * 2 + 1]]) == -1 && findArr(closed, [x + a[i * 2], y + a[i * 2 + 1]]) == -1)
+        if (
+            x + a[i * 2] >= 0 &&
+            x + a[i * 2] < boardLength &&
+            y + a[i * 2 + 1] >= 0 &&
+            y + a[i * 2 + 1] < boardLength
+        )
+            if (
+                board[x + a[i * 2]][y + a[i * 2 + 1]] == color &&
+                findArr(open, [x + a[i * 2], y + a[i * 2 + 1]]) == -1 &&
+                findArr(closed, [x + a[i * 2], y + a[i * 2 + 1]]) == -1
+            )
                 ret.push([x + a[i * 2], y + a[i * 2 + 1]]);
 
     return ret;
@@ -13,10 +21,17 @@ function getConnections(x, y, board, color, open, closed) {
 
 function checkWin(board, color) {
     const boardLength = board.length;
-    var open = [], openPrev = [], closed = [], closedPrev = [];
+    var open = [],
+        openPrev = [],
+        closed = [],
+        closedPrev = [];
     for (var a = 0; a < boardLength; a++) {
         if (board[color == 0 ? a : 0][color == 0 ? 0 : a] == color) {
-            open.length = openPrev.length = closed.length = closedPrev.length = 0;
+            open.length =
+                openPrev.length =
+                closed.length =
+                closedPrev.length =
+                    0;
             var pathFound = false;
             open.push([color == 0 ? a : 0, color == 0 ? 0 : a]);
             openPrev.push(-1);
@@ -30,7 +45,14 @@ function checkWin(board, color) {
                     pathFound = true;
                     break;
                 }
-                var connections = getConnections(u[0], u[1], board, color, open, closed);
+                var connections = getConnections(
+                    u[0],
+                    u[1],
+                    board,
+                    color,
+                    open,
+                    closed
+                );
                 for (var i = 0; i < connections.length; i++) {
                     open.push(connections[i]);
                     openPrev.push(closed.length - 1);

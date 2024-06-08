@@ -79,11 +79,29 @@ function loadGameState() {
 }
 
 function exportGameData() {
-    alert("Here is the game data:\n" + getGameState());
+    navigator.clipboard.writeText(getGameState().replace(/[\r\n\t]+/g, ""))
+    alert("Here is the game data (already copied to clipboard):\n" + getGameState().replace(/[\r\n\t]+/g, ""));
 }
 
-function importGameData() {
-    let data = prompt("Paste game data here:");
+
+function isValidJSON(input) {
+    try {
+        // Try to parse the input string as JSON
+        JSON.parse(input);
+
+    } catch (e) {
+        // If parsing fails, return false
+        return false;
+    }
+    return true;
+}
+
+function importGameData(data) {
+    if (!isValidJSON(data)) {
+        alert("There was an issue importing your data. Please try again.");
+        return;
+    }
+    JSON.parse(data);
     saveGameState(data);
     loadGameState();
     draw(board, playerColor, selected, width, radius, ctx);
@@ -96,8 +114,10 @@ function mouseDown(event) {
         if (selected[0] != -1 && selected[1] != -1) {
             pastMoves.push([selected[0], selected[1], playerColor]);
             board[selected[0]][selected[1]] = playerColor;
-            if (multiplayer) playerColor = oppositeColor(playerColor);
-            else botMove(board, pastMoves, playerColor);
+            if (!checkWin(board, playerColor)) {
+                if (multiplayer) playerColor = oppositeColor(playerColor);
+                else botMove(board, pastMoves, playerColor);
+            }
             draw(board, playerColor, selected, width, radius, ctx);
             handleWinCheck();
         }
@@ -155,5 +175,5 @@ function load() {
     document.getElementById("change-mode").checked = multiplayer;
     document.getElementById("switch-dark-mode").checked = darkMode;
     draw(board, playerColor, selected, width, radius, ctx);
-    handleWinCheck(showAlerts = false);
+    handleWinCheck((showAlerts = false));
 }

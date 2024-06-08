@@ -19,7 +19,10 @@
         <button id="new-game">New game</button>
         <button onclick="undo()">Undo</button>
         <button onclick="exportGameData()">Export Game Data</button>
-        <button onclick="importGameData()">Load Game Data</button>
+        <div>
+            <div class="dark-mode-text">Import Game Data (press enter after pasting):</div>
+            <input onchange="importGameData(this.value)">
+        </div>
         <div>
             <div class="dark-mode-text">Multiplayer:</div>
             <input type="checkbox" onclick="changeMode()" id="change-mode">

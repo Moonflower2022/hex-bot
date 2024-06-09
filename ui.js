@@ -101,9 +101,11 @@ function draw(board, player, selected, width, radius, ctx) {
     ctx.strokeStyle = "white";
     for (var j = 0; j < boardLength; j++) {
         for (var i = 0; i < boardLength; i++) {
-            if (board[i][j] == 0) ctx.fillStyle = RED;
-            else if (board[i][j] == 1) ctx.fillStyle = BLUE;
-            else if (i == selected[0] && j == selected[1])
+            if (board[i][j] == 0) {
+                ctx.fillStyle = RED;
+            } else if (board[i][j] == 1) {
+                ctx.fillStyle = BLUE;
+            } else if (i == selected[0] && j == selected[1]) {
                 ctx.fillStyle =
                     "rgb(" +
                     (i + (player == 0 ? 241 : 0)) +
@@ -111,13 +113,35 @@ function draw(board, player, selected, width, radius, ctx) {
                     (j + (player == 0 ? 0 : 140)) +
                     "," +
                     (player == 0 ? 38 : 171) +
-                    ")"; //player === 0 ? LIGHT_BLUE : LIGHT_RED;
-            else ctx.fillStyle = "rgb(" + (i + 241) + "," + (j + 220) + ",178)";
+                    ")";
+            } else {
+                ctx.fillStyle = "rgb(" + (i + 241) + "," + (j + 220) + ",178)";
+            }
             drawHexagon(
                 ctx,
                 ...getDrawCoordinates(i, j, width, radius),
                 radius
             );
+
+            if (
+                (positionsEqual(
+                    [i, j],
+                    pastMoves[pastMoves.length - 1 - playerColor]
+                ) &&
+                    board[i][j] == 1) ||
+                (positionsEqual(
+                    [i, j],
+                    pastMoves[pastMoves.length - 1 - oppositeColor(playerColor)]
+                ) &&
+                    board[i][j] == 0)
+            ) {
+                ctx.fillStyle = YELLOW;
+                drawHexagon(
+                    ctx,
+                    ...getDrawCoordinates(i, j, width, radius),
+                    radius / 2
+                );
+            }
         }
     }
 }

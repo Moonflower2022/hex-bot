@@ -1,7 +1,8 @@
 const radius = 20;
 const width = radius * Math.sqrt(3);
-const RED = "rgb(185,0,39)";
-const BLUE = "rgb(0,94,132)";
+const RED = "rgb(185, 0, 39)";
+const BLUE = "rgb(0, 94, 132)";
+const YELLOW = "rgb(252, 237, 30)"
 var ctx;
 var selected = [-1, -1];
 var board;

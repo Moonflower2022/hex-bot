@@ -145,12 +145,6 @@ function monteCarloTreeSearch(
     return bestChild.moveMade;
 }
 
-function botMove(board, hist, playerColor) {
-    move = monteCarloTreeSearch(board, playerColor, 10, 1, 1);
-    hist.push([move[0], move[1], 1]);
-    board[move[0]][move[1]] = 1;
-}
-
 function randomMove(board, blackList = null) {
     const boardLength = board.length;
     var move;

@@ -124,15 +124,19 @@ function draw(board, player, selected, width, radius, ctx) {
             );
 
             if (
-                (positionsEqual(
-                    [i, j],
-                    pastMoves[pastMoves.length - 1 - playerColor]
-                ) &&
+                (pastMoves.length >= 1 + playerColor &&
+                    positionsEqual(
+                        [i, j],
+                        pastMoves[pastMoves.length - 1 - playerColor]
+                    ) &&
                     board[i][j] == 1) ||
-                (positionsEqual(
-                    [i, j],
-                    pastMoves[pastMoves.length - 1 - oppositeColor(playerColor)]
-                ) &&
+                (pastMoves.length >= 1 + oppositeColor(playerColor) &&
+                    positionsEqual(
+                        [i, j],
+                        pastMoves[
+                            pastMoves.length - 1 - oppositeColor(playerColor)
+                        ]
+                    ) &&
                     board[i][j] == 0)
             ) {
                 ctx.fillStyle = YELLOW;

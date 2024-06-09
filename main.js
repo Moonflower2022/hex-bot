@@ -147,6 +147,12 @@ function switchDarkMode() {
     saveGameState();
 }
 
+function botMove(board, hist, playerColor) {
+    move = monteCarloTreeSearch(board, playerColor, 10, 1, 1);
+    hist.push([move[0], move[1], 1]);
+    board[move[0]][move[1]] = 1;
+}
+
 function init(boardLength) {
     board = new Array(boardLength);
     for (var i = 0; i < boardLength; i++) {

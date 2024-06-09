@@ -1,5 +1,5 @@
 class Node {
-    constructor(state, parent, color, terminated) {
+    constructor(state, parent, color, terminated, moveMade) {
         this.state = state;
         this.color = color; // color means the color of the player that just moved
         this.parent = parent; // null if root
@@ -10,8 +10,9 @@ class Node {
         this.remainingSquares =
             parent === null
                 ? remainingSquares(state)
-                : this.parent.remainingsquares - 1;
+                : this.parent.remainingSquares - 1;
         this.terminated = terminated; // false means no, number means the side that won (since no ties)
+        this.moveMade = moveMade;
     }
 
     isFullyExpanded = () => {
@@ -29,20 +30,28 @@ class Node {
     };
 
     bestUTC = () => {
-        this.children.sort((node1, node2) => {
-            return node2.evaluate() - node1.evaluate();
+        const scores = this.children.map((child, i) => {
+            return { index:i, value: child.UTC() };
         });
 
-        return this.children[0];
+        let bestScore = 0;
+        let bestIndex;
+        for (let score of scores) {
+            if (score.value > bestScore) {
+                bestScore = score.value;
+                bestIndex = score.index;
+            }
+        }
+        return this.children[bestIndex];
     };
 
-    evaluate = () => {
-        if (!this.isLeaf) {
-            throw new Error("evaluating a non leaf node");
+    UTC = () => {
+        if (this.simulations === 0) {
+            return 1000000;
         }
-        let ratio = this.wins / this.simulations;
-        let constant = Math.sqrt(2);
-        let bonus = Math.sqrt(
+        const ratio = this.wins / this.simulations;
+        const constant = Math.sqrt(2);
+        const bonus = Math.sqrt(
             Math.log(this.parent.simulations) / this.simulations
         );
         return ratio + constant * bonus;
@@ -53,15 +62,14 @@ class Node {
         let color = this.color;
         while (!checkWin(state, color)) {
             let move = randomMove(state);
-            state[move[0]][move[1]] = oppositeColor(color);
             color = oppositeColor(color);
+            state[move[0]][move[1]] = color;
         }
         return color;
     };
 
     expand = (expansionCount) => {
         if (this.terminated !== false) {
-            console.log("warning: expanding terminated node, returning this");
             return this;
         } else {
             for (let i = 0; i < expansionCount; i++) {
@@ -73,18 +81,21 @@ class Node {
 
     addChild = () => {
         let newState = copyState(this.state);
-        let move = randomMove(newState);
+        let move = randomMove(
+            newState,
+            this.children.map((child) => {
+                return child.moveMade;
+            })
+        );
         let newColor = oppositeColor(this.color);
         newState[move[0]][move[1]] = newColor;
 
-        this.children.forEach((node) => {
-            if (!statesEqual(node.state, newState)) return;
-        });
         let newNode = new Node(
             newState,
             this,
             newColor,
-            checkWin(newState, newColor) ? newColor : false
+            checkWin(newState, newColor) ? newColor : false,
+            move
         );
         this.children.push(newNode);
         this.isLeaf = false;
@@ -104,39 +115,43 @@ class Node {
 function monteCarloTreeSearch(
     state,
     color,
-    iterations,
+    searchTime,
     simulationCount,
     expansionCount
 ) {
-    let root = new Node(state, null, color, false);
-    for (let i = 0; i < iterations; i++) {
+    let root = new Node(state, null, color, false, null);
+    let end = Date.now() + searchTime * 1000;
+    let i = 0;
+    while (Date.now() < end) {
+        //for (let i = 0; i < iterations; i++) {
         let node = root.chooseLeaf();
         let simulationNode = node.expand(expansionCount);
         for (let j = 0; j < simulationCount; j++) {
             winningColor = simulationNode.simulate();
             simulationNode.backpropogate(winningColor);
         }
+        i++;
     }
+    console.log(`ran for ${i} iterations`);
 
     let bestRatio = -1;
     for (let child of root.children) {
         let ratio = child.wins / child.simulations;
         if (ratio > bestRatio) {
             bestRatio = ratio;
-            bestState = child.state;
+            bestChild = child;
         }
     }
-    console.log(root)
-    return getMove(state, bestState);
+    return bestChild.moveMade;
 }
 
 function botMove(board, hist, playerColor) {
-    move = monteCarloTreeSearch(board, playerColor, 1000, 1, 1);
+    move = monteCarloTreeSearch(board, playerColor, 10, 1, 1);
     hist.push([move[0], move[1], 1]);
     board[move[0]][move[1]] = 1;
 }
 
-function randomMove(board) {
+function randomMove(board, blackList = null) {
     const boardLength = board.length;
     var move;
     do {
@@ -144,7 +159,12 @@ function randomMove(board) {
             Math.floor(Math.random() * boardLength),
             Math.floor(Math.random() * boardLength),
         ];
-    }
-    while (board[move[0]][move[1]] != -1);
+    } while (
+        board[move[0]][move[1]] != -1 ||
+        (blackList !== null &&
+            blackList.some((blackListedMove) => {
+                return positionsEqual(blackListedMove, move);
+            }))
+    );
     return move;
 }

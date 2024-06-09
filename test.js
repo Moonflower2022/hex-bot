@@ -1,101 +1,121 @@
-const array = [
-    [-1, -1, 1, 1],
-    [-1, 1, -1, 0],
-    [0, 0, 0, -1],
-    [-1, -1, -1, -1],
-];
-
-const flippedArray = array[0].map((_, colIndex) =>
-    array.map((row) => -row[colIndex])
-);
-
-function findArr(arr, element) {
-    for (var i = 0; i < arr.length; i++)
-        if (JSON.stringify(arr[i]) == JSON.stringify(element)) return i;
-    return -1;
-}
-
-function getConnections(x, y, board, color, open, closed) {
-    const boardLength = board.length;
-    var a = [-1, 0, 1, 0, 0, -1, 0, 1, 1, -1, -1, 1];
-    var ret = [];
-    for (var i = 0; i < 6; i++)
-        if (
-            x + a[i * 2] >= 0 &&
-            x + a[i * 2] < boardLength &&
-            y + a[i * 2 + 1] >= 0 &&
-            y + a[i * 2 + 1] < boardLength
-        )
-            if (
-                board[x + a[i * 2]][y + a[i * 2 + 1]] == color &&
-                findArr(open, [x + a[i * 2], y + a[i * 2 + 1]]) == -1 &&
-                findArr(closed, [x + a[i * 2], y + a[i * 2 + 1]]) == -1
-            )
-                ret.push([x + a[i * 2], y + a[i * 2 + 1]]);
-
-    return ret;
-}
-
-function checkWin(board, color) {
-    const boardLength = board.length;
-    var open = [],
-        openPrev = [],
-        closed = [],
-        closedPrev = [];
-    for (var a = 0; a < boardLength; a++) {
-        if (board[color == 0 ? a : 0][color == 0 ? 0 : a] == color) {
-            open.length =
-                openPrev.length =
-                closed.length =
-                closedPrev.length =
-                    0;
-            var pathFound = false;
-            open.push([color == 0 ? a : 0, color == 0 ? 0 : a]);
-            openPrev.push(-1);
-            while (open.length > 0) {
-                var u = open[0];
-                open.splice(0, 1);
-                var uI = openPrev.splice(0, 1);
-                closed.push(u);
-                closedPrev.push(uI);
-                if (u[oppositeColor(color)] == boardLength - 1) {
-                    pathFound = true;
-                    break;
-                }
-                var connections = getConnections(
-                    u[0],
-                    u[1],
-                    board,
-                    color,
-                    open,
-                    closed
-                );
-                for (var i = 0; i < connections.length; i++) {
-                    open.push(connections[i]);
-                    openPrev.push(closed.length - 1);
-                }
-            }
-            if (pathFound) {
-                var path = [];
-                var u = closed.length - 1;
-                while (closedPrev[u] != -1) {
-                    path.push(closed[u]);
-                    u = closedPrev[u];
-                }
-                path.push([color == 0 ? a : 0, color == 0 ? 0 : a]);
-                path.reverse();
-                return path;
-            }
+function copyState(state) {
+    const boardLength = state.length;
+    let newState = new Array(boardLength);
+    for (var i = 0; i < boardLength; i++) {
+        newState[i] = new Array(boardLength);
+        for (var j = 0; j < boardLength; j++) newState[i][j] = -1;
+    }
+    for (let i = 0; i < boardLength; i++) {
+        for (let j = 0; j < boardLength; j++) {
+            newState[i][j] = state[i][j];
         }
     }
-    return false;
+    return newState;
 }
 
-function oppositeColor(color) {
-    return color == 0 ? 1 : 0;
+function copyStateOld(state) {
+    const boardLength = state.length;
+    let newState = [];
+    for (let i = 0; i < boardLength; i++) {
+        newState.push([]);
+        for (let j = 0; j < boardLength; j++) {
+            newState[i].push(state[i][j]);
+        }
+    }
+    return newState;
 }
 
-console.log(array);
-console.log(checkWin(array, 0));
-console.log(flippedArray);
-console.log(checkWin(flippedArray, 0));
+let state = [
+    [
+        1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1,
+        -1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1,
+        1, -1,
+    ],
+    [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        1, 1,
+    ],
+];
+
+console.time("new");
+for (let i = 0; i < 100000; i++) {
+    copyState(state);
+}
+console.timeEnd("new");
+
+console.time("old");
+for (let i = 0; i < 100000; i++) {
+    copyStateOld(state);
+}
+console.timeEnd("old");

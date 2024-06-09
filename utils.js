@@ -1,6 +1,6 @@
 function findArr(arr, element) {
     for (var i = 0; i < arr.length; i++)
-        if (JSON.stringify(arr[i]) == JSON.stringify(element)) return i;
+        if (positionsEqual(arr[i], element)) return i;
     return -1;
 }
 
@@ -12,8 +12,9 @@ function colorsEqual(color1, color2) {
 }
 
 function statesEqual(state1, state2) {
-    for (let i = 0; i < state1.length; i++) {
-        for (let j = 0; j < state1[i].length; j++) {
+    const boardLength = state1.length;
+    for (let i = 0; i < boardLength; i++) {
+        for (let j = 0; j < boardLength; j++) {
             if (state1[i][j] !== state2[j][i]) {
                 return false;
             }
@@ -22,10 +23,15 @@ function statesEqual(state1, state2) {
     return true;
 }
 
+function positionsEqual(move1, move2) {
+    return move1[0] === move2[0] && move1[1] === move2[1];
+}
+
 function remainingSquares(state) {
+    const boardLength = state.length;
     let total = 0;
-    for (let i = 0; i < state.length; i++) {
-        for (let j = 0; j < state[i].length; j++) {
+    for (let i = 0; i < boardLength; i++) {
+        for (let j = 0; j < boardLength; j++) {
             if (state[i][j] === -1) {
                 total++;
             }
@@ -35,21 +41,19 @@ function remainingSquares(state) {
 }
 
 function copyState(state) {
-    return JSON.parse(JSON.stringify(state));
+    const boardLength = state.length;
+    let newState = [];
+    for (let i = 0; i < boardLength; i++) {
+        newState.push([]);
+        for (let j = 0; j < boardLength; j++) {
+            newState[i].push(state[i][j]);
+        }
+    }
+    return newState;
 }
 
 function oppositeColor(color) {
     return color == 0 ? 1 : 0;
-}
-
-function getMove(previousState, state) {
-    for (let i = 0; i < state.length; i++) {
-        for (let j = 0; j < state[i].length; j++) {
-            if (previousState[i][j] !== state[i][j]) {
-                return [i, j];
-            }
-        }
-    }
 }
 
 Object.defineProperty(Array.prototype, "random", {

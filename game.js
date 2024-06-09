@@ -1,6 +1,6 @@
 function getConnections(x, y, board, color, open, closed) {
     const boardLength = board.length;
-    var a = [-1, 0, 1, 0, 0, -1, 0, 1, 1, -1, -1, 1];
+    const a = [-1, 0, 1, 0, 0, -1, 0, 1, 1, -1, -1, 1];
     var ret = [];
     for (var i = 0; i < 6; i++)
         if (
@@ -16,7 +16,7 @@ function getConnections(x, y, board, color, open, closed) {
             )
                 ret.push([x + a[i * 2], y + a[i * 2 + 1]]);
 
-    return ret;
+    return ret; 
 }
 
 function checkWin(board, color) {
@@ -45,7 +45,7 @@ function checkWin(board, color) {
                     pathFound = true;
                     break;
                 }
-                var connections = getConnections(
+                var connections = getConnectionsOld(
                     u[0],
                     u[1],
                     board,

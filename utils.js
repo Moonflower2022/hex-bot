@@ -11,6 +11,14 @@ function colorsEqual(color1, color2) {
     return true;
 }
 
+function positionsEqual(move1, move2) {
+    return move1[0] === move2[0] && move1[1] === move2[1];
+}
+
+function isInBoard(x, y, boardLength) {
+    return x >= 0 && x < boardLength && y >= 0 && y < boardLength;
+}
+
 function statesEqual(state1, state2) {
     const boardLength = state1.length;
     for (let i = 0; i < boardLength; i++) {
@@ -21,10 +29,6 @@ function statesEqual(state1, state2) {
         }
     }
     return true;
-}
-
-function positionsEqual(move1, move2) {
-    return move1[0] === move2[0] && move1[1] === move2[1];
 }
 
 function remainingSquares(state) {
@@ -52,8 +56,35 @@ function copyState(state) {
     return newState;
 }
 
+function initBoard(boardLength) {
+    board = new Array(boardLength);
+    for (var i = 0; i < boardLength; i++) {
+        board[i] = new Array(boardLength);
+        for (var j = 0; j < boardLength; j++) board[i][j] = -1;
+    }
+    return board;
+}
+
 function oppositeColor(color) {
-    return color == 0 ? 1 : 0;
+    return 1 - color; // color === 0 ? 1 : 0;
+}
+
+function randomMove(board, blackList = null) {
+    const boardLength = board.length;
+    var move;
+    do {
+        move = [
+            Math.floor(Math.random() * boardLength),
+            Math.floor(Math.random() * boardLength),
+        ];
+    } while (
+        board[move[0]][move[1]] != -1 ||
+        (blackList !== null &&
+            blackList.some((blackListedMove) => {
+                return positionsEqual(blackListedMove, move);
+            }))
+    );
+    return move;
 }
 
 Object.defineProperty(Array.prototype, "random", {

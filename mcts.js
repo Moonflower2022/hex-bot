@@ -115,15 +115,14 @@ class Node {
 function monteCarloTreeSearch(
     state,
     color,
-    searchTime,
+    searchSeconds,
     simulationCount,
     expansionCount
 ) {
     let root = new Node(state, null, color, false, null);
-    let end = Date.now() + searchTime * 1000;
+    let end = Date.now() + searchSeconds * 1000;
     let i = 0;
     while (Date.now() < end) {
-        //for (let i = 0; i < iterations; i++) {
         let node = root.chooseLeaf();
         let simulationNode = node.expand(expansionCount);
         for (let j = 0; j < simulationCount; j++) {
@@ -134,31 +133,12 @@ function monteCarloTreeSearch(
     }
     console.log(`ran for ${i} iterations`);
 
-    let bestRatio = -1;
-    for (let child of root.children) {
-        let ratio = child.wins / child.simulations;
-        if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestChild = child;
-        }
-    }
-    return bestChild.moveMade;
+    root.children.sort((a, b) => {return b.wins / b.simulations - a.wins / a.simulations})
+    return root.children[0].moveMade;
 }
 
-function randomMove(board, blackList = null) {
-    const boardLength = board.length;
-    var move;
-    do {
-        move = [
-            Math.floor(Math.random() * boardLength),
-            Math.floor(Math.random() * boardLength),
-        ];
-    } while (
-        board[move[0]][move[1]] != -1 ||
-        (blackList !== null &&
-            blackList.some((blackListedMove) => {
-                return positionsEqual(blackListedMove, move);
-            }))
-    );
-    return move;
+function botMove(board, pastMoves, playerColor) {
+    move = monteCarloTreeSearch(board, playerColor, 1, 1, 1);
+    pastMoves.push([move[0], move[1], 1]);
+    board[move[0]][move[1]] = 1;
 }

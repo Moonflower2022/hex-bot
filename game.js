@@ -45,7 +45,7 @@ function checkWin(board, color) {
                     pathFound = true;
                     break;
                 }
-                var connections = getConnectionsOld(
+                var connections = getConnections(
                     u[0],
                     u[1],
                     board,

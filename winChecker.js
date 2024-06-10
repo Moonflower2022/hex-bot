@@ -67,6 +67,12 @@ class DisjointSet {
 
 class WinChecker {
     constructor(boardLength, pastMoves) {
+        this.boardLength = boardLength
+        this.pastMoves = pastMoves
+        this.reset()
+    }
+
+    reset = () => {
         this.board = initBoard(boardLength);
 
         const cells = generateCells(boardLength);
@@ -158,6 +164,7 @@ class WinChecker {
                 }))
         );
         this.move(...move, color);
+        return move
     };
 }
 

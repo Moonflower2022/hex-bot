@@ -60,7 +60,7 @@ class Node {
     simulate = () => {
         let state = copyState(this.state);
         let color = this.color;
-        while (!checkWin(state, color)) {
+        while (!checkWinPath(state, color)) {
             let move = randomMove(state);
             color = oppositeColor(color);
             state[move[0]][move[1]] = color;

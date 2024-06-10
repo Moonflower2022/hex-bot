@@ -5,12 +5,12 @@ const BLUE = "rgb(0, 94, 132)";
 const YELLOW = "rgb(252, 237, 30)";
 var ctx;
 var selected = [-1, -1];
-var board;
 var pastMoves = [];
 var playerColor = 0; // 0 is red and 1 is blue
 var multiplayer = false;
 var active = true;
 var boardLength = 14;
+var board = initBoard(boardLength);
 var darkMode = false;
 
 function changeMode() {

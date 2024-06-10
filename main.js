@@ -119,6 +119,8 @@ function mouseDown(event) {
             if (!checkWinPath(board, playerColor)) {
                 if (multiplayer) playerColor = oppositeColor(playerColor);
                 else botMove(board, pastMoves, playerColor);
+            } else {
+                playerColor = oppositeColor(playerColor)
             }
             draw(board, playerColor, selected, width, radius, ctx);
             handleWinCheck();

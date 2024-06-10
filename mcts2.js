@@ -160,7 +160,7 @@ class WinChecker {
 }
 
 class Node {
-    constructor(parent, color, terminated, moveMade) {
+    constructor(parent, color, terminated, moveMade, remainingSquares = null) {
         this.color = color; // color means the color of the player that just moved
         this.parent = parent; // null if root
         this.isLeaf = true;
@@ -169,7 +169,7 @@ class Node {
         this.wins = 0;
         this.remainingSquares =
             parent === null
-                ? remainingSquares(state)
+                ? remainingSquares
                 : this.parent.remainingSquares - 1;
         this.terminated = terminated; // false means no, number means the side that won (since no ties)
         this.moveMade = moveMade;
@@ -240,7 +240,7 @@ class Node {
         let newNode = new Node(
             this,
             newColor,
-            checkWin(newState, newColor) ? newColor : false,
+            checkWinPath(newState, newColor) ? newColor : false,
             move
         );
         this.children.push(newNode);
@@ -262,7 +262,7 @@ class MCTS {
     constructor(board, color, pastMoves) {
         this.boardLength = board.length;
         this.pastMoves = pastMoves;
-        this.root = new Node(null, color, false, null);
+        this.root = new Node(null, color, false, null, this.boardLength * this.boardLength - pastMoves.length);
     }
 
     run = (searchSeconds, expansionCount, simulationCount) => {
@@ -305,7 +305,7 @@ class MCTS {
 }
 
 function botMove(board, pastMoves, playerColor) {
-    let searcher = new MCTS(state, playerColor, pastMoves);
+    let searcher = new MCTS(board, playerColor, pastMoves);
     move = searcher.run(1, 1, 1)
     hist.push([move[0], move[1], 1]);
     board[move[0]][move[1]] = 1;

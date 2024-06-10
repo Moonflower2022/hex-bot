@@ -94,7 +94,7 @@ class Node {
             newState,
             this,
             newColor,
-            checkWin(newState, newColor) ? newColor : false,
+            checkWinPath(newState, newColor) ? newColor : false,
             move
         );
         this.children.push(newNode);

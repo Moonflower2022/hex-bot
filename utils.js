@@ -57,7 +57,7 @@ function copyState(state) {
 }
 
 function initBoard(boardLength) {
-    board = new Array(boardLength);
+    let board = new Array(boardLength);
     for (var i = 0; i < boardLength; i++) {
         board[i] = new Array(boardLength);
         for (var j = 0; j < boardLength; j++) board[i][j] = -1;
@@ -85,6 +85,20 @@ function randomMove(board, blackList = null) {
             }))
     );
     return move;
+}
+
+function getPastMoves(board) {
+    const boardLength = board.length
+    let pastMoves = [];
+
+    for (let i = 0; i < boardLength; i++) {
+        for (let j = 0; j < boardLength; j++) {
+            if (board[i][j] !== -1) {
+                pastMoves.push([i, j, board[i][j]]);
+            }
+        }
+    }
+    return pastMoves;
 }
 
 Object.defineProperty(Array.prototype, "random", {

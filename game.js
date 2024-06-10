@@ -19,7 +19,7 @@ function getConnections(x, y, board, color, open, closed) {
     return ret; 
 }
 
-function checkWin(board, color) {
+function checkWinPath(board, color) {
     const boardLength = board.length;
     var open = [],
         openPrev = [],

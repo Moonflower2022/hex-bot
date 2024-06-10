@@ -2,7 +2,7 @@ const radius = 20;
 const width = radius * Math.sqrt(3);
 const RED = "rgb(185, 0, 39)";
 const BLUE = "rgb(0, 94, 132)";
-const YELLOW = "rgb(252, 237, 30)"
+const YELLOW = "rgb(252, 237, 30)";
 var ctx;
 var selected = [-1, -1];
 var board;
@@ -80,16 +80,17 @@ function loadGameState() {
 }
 
 function exportGameData() {
-    navigator.clipboard.writeText(getGameState().replace(/[\r\n\t]+/g, ""))
-    alert("Here is the game data (already copied to clipboard):\n" + getGameState().replace(/[\r\n\t]+/g, ""));
+    navigator.clipboard.writeText(getGameState().replace(/[\r\n\t]+/g, ""));
+    alert(
+        "Here is the game data (already copied to clipboard):\n" +
+            getGameState().replace(/[\r\n\t]+/g, "")
+    );
 }
-
 
 function isValidJSON(input) {
     try {
         // Try to parse the input string as JSON
         JSON.parse(input);
-
     } catch (e) {
         // If parsing fails, return false
         return false;
@@ -115,7 +116,7 @@ function mouseDown(event) {
         if (selected[0] != -1 && selected[1] != -1) {
             pastMoves.push([selected[0], selected[1], playerColor]);
             board[selected[0]][selected[1]] = playerColor;
-            if (!checkWin(board, playerColor)) {
+            if (!checkWinPath(board, playerColor)) {
                 if (multiplayer) playerColor = oppositeColor(playerColor);
                 else botMove(board, pastMoves, playerColor);
             }
@@ -148,7 +149,7 @@ function switchDarkMode() {
 }
 
 function init(boardLength) {
-    board = initBoard(boardLength)
+    board = initBoard(boardLength);
     pastMoves = [];
     active = true;
     saveGameState();

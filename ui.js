@@ -47,8 +47,8 @@ function drawPath(ctx, p) {
 }
 
 function handleWinCheck(showAlerts = true) {
-    var p0 = checkWin(board, 0),
-        p1 = checkWin(board, 1);
+    var p0 = checkWinPath(board, 0),
+        p1 = checkWinPath(board, 1);
     if (p0 != false) {
         drawPath(ctx, p0);
         if (showAlerts)

@@ -12,6 +12,8 @@ var active = true;
 var boardLength = 14;
 var board = initBoard(boardLength);
 var darkMode = false;
+var worker;
+var botStatus;
 
 function changeMode() {
     multiplayer = !multiplayer;
@@ -89,10 +91,8 @@ function exportGameData() {
 
 function isValidJSON(input) {
     try {
-        // Try to parse the input string as JSON
         JSON.parse(input);
     } catch (e) {
-        // If parsing fails, return false
         return false;
     }
     return true;
@@ -113,15 +113,13 @@ function importGameData(data) {
 function mouseDown(event) {
     getSelected(event);
     if (active) {
-        if (selected[0] != -1 && selected[1] != -1) {
+        if (!positionsEqual(selected, [-1, -1])) {
             pastMoves.push([selected[0], selected[1], playerColor]);
             board[selected[0]][selected[1]] = playerColor;
-            if (!checkWinPath(board, playerColor)) {
-                if (multiplayer) playerColor = oppositeColor(playerColor);
-                else botMove(board, pastMoves, playerColor);
-            } else {
-                playerColor = oppositeColor(playerColor)
+            if (!checkWinPath(board, playerColor) && !multiplayer) {
+                handleBotMove()
             }
+            playerColor = oppositeColor(playerColor)
             draw(board, playerColor, selected, width, radius, ctx);
             handleWinCheck();
         }
@@ -150,8 +148,43 @@ function switchDarkMode() {
     saveGameState();
 }
 
+function handleBotMove() {
+    if (window.Worker) {
+        worker.postMessage([board, playerColor]);
+        botStatus.innerHTML = "Running search...";
+    } else {
+        botMove(board, pastMoves, playerColor);
+        playerColor = oppositeColor(playerColor)
+    }
+}
+
+function initWebWorker() {
+    if (window.Worker) {
+        worker = new Worker("worker.js");
+
+        worker.onmessage = function (message) {
+            botStatus.innerHTML = "";
+
+            const botMove = message.data;
+
+            pastMoves.push([botMove[0], botMove[1], 1]);
+            board[botMove[0]][botMove[1]] = 1;
+
+            playerColor = oppositeColor(playerColor)
+
+            draw(board, playerColor, selected, width, radius, ctx);
+            handleWinCheck();
+        };
+    } else {
+        console.log(
+            "Your browser does not support web workers, defaulting to running script on main thread."
+        );
+    }
+}
+
 function init(boardLength) {
     board = initBoard(boardLength);
+    playerColor = 0;
     pastMoves = [];
     active = true;
     saveGameState();
@@ -165,6 +198,8 @@ function load() {
     newGameButton.onclick = () => {
         init(boardLength);
     };
+    botStatus = document.getElementById("bot-status");
+    initWebWorker();
     canvas.onmousedown = mouseDown;
     canvas.onmousemove = mouseMove;
     if (localStorage.getItem("hexGameState") === null) {
